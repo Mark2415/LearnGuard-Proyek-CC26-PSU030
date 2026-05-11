@@ -18,21 +18,21 @@ st.set_page_config(
 )
 
 # =============================================================
-# LOAD data (Simulasi - Nanti diganti dengan kode asli Anda)
+# LOAD DATA (Simulasi - Nanti diganti dengan kode asli Anda)
 # =============================================================
 @st.cache_data
 def load_data():
     # Pastikan path ini sesuai dengan lokasi file Anda saat dijalankan
     # Contoh: '../data/processed/wrangled/df_master_weekly_clean.csv'
     try:
-        df_weekly = pd.read_csv('../data/processed/wrangled/df_master_weekly_clean.csv')
+        df_weekly = pd.read_csv('../../data/processed/wrangled/df_master_weekly_clean.csv')
         df_weekly = df_weekly[df_weekly["week"].isin([1, 2, 3, 4])].copy()
         df_weekly["risk_group"] = df_weekly["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
         })
 
-        df_final = pd.read_csv("../data/processed/df_final.csv")
+        df_final = pd.read_csv("../../data/processed/df_final.csv")
         df_final["risk_group"] = df_final["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
@@ -40,12 +40,12 @@ def load_data():
         return df_weekly, df_final
     except FileNotFoundError:
         st.warning("File data tidak ditemukan. Menggunakan data dummy untuk demo.")
-        # data dummy agar dashboard tetap bisa dilihat
-        df_weekly = pd.dataFrame({
+        # Data dummy agar dashboard tetap bisa dilihat
+        df_weekly = pd.DataFrame({
             "week": [1, 2, 3, 4],
             "count": [22963, 23168, 23822, 22135]
         })
-        df_final = pd.dataFrame({
+        df_final = pd.DataFrame({
             "risk_label": [0, 0, 1, 0, 1],
             "score": [80, 90, 40, 75, 30]
         })
@@ -62,14 +62,14 @@ palette = {"Pass/Distinction": "#2ecc71", "Fail/Withdrawn": "#e74c3c"}
 # SIDEBAR MENU
 # =============================================================
 st.sidebar.title("🧭 Navigasi")
-menu_options = ["Stat data Bersih", "Pertanyaan Bisnis", "Model MLM"]
+menu_options = ["Stat Data Bersih", "Pertanyaan Bisnis", "Model MLM"]
 choice = st.sidebar.radio("Pilih Menu:", menu_options)
 
 # =============================================================
-# HALAMAN: STAT data BERSIH (HOME)
+# HALAMAN: STAT DATA BERSIH (HOME)
 # =============================================================
-if choice == "Stat data Bersih":
-    st.title("Stat data Bersih & Insight")
+if choice == "Stat Data Bersih":
+    st.title("📊 Stat Data Bersih & Insight")
     st.markdown("Ringkasan kualitas data dan statistik persiapan sebelum analisis lebih lanjut.")
     st.markdown("---")
 
@@ -79,9 +79,9 @@ if choice == "Stat data Bersih":
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Status data", "Bersih", help="0 baris dihapus, tanpa negative weeks.")
+        st.metric("Status Data", "Bersih", help="0 baris dihapus, tanpa negative weeks.")
     with col2:
-        st.metric("Total Siswa (df_final)", "27,795", help="data awal siswa.")
+        st.metric("Total Siswa (df_final)", "27,795", help="Data awal siswa.")
     with col3:
         st.metric("Siswa Analisis (df_pb2)", "20,818", help="Setelah filter data lengkap.")
     with col4:
@@ -90,7 +90,7 @@ if choice == "Stat data Bersih":
     st.markdown("---")
 
     # --- BAGIAN 2: VISUALISASI GAMBAR (FRAME HITAM & BACKGROUND PUTIH) ---
-    st.subheader("Visualisasi data")
+    st.subheader("Visualisasi Data")
     
     img_folder = "img" 
     images = [
@@ -155,13 +155,13 @@ if choice == "Stat data Bersih":
             with col_info:
                 # Insight singkat berdasarkan gambar (opsional, bisa disesuaikan)
                 if "quality" in img_name.lower():
-                    st.markdown("**Kualitas:** 0 baris dihapus. data bersih sempurna.")
+                    st.markdown("**Kualitas:** 0 baris dihapus. Data bersih.")
                 elif "mingguan" in img_name.lower():
                     st.markdown("**Balance:** Distribusi mingguan seimbang (~25% per minggu).")
                 elif "risk" in img_name.lower():
                     st.markdown("**Imbalance:** Rasio 58:42 (Pass:Fail). Moderat, bisa pakai class_weight.")
                 elif "lost" in img_name.lower():
-                    st.markdown("**data Loss:** 25.1% data hilang di df_pb2 (siswa tanpa tugas).")
+                    st.markdown("**Data Loss:** 25.1% data hilang di df_pb2 (siswa tanpa tugas).")
                 elif "korelasi" in img_name.lower():
                     st.markdown("**Korelasi:** Hanya berlaku untuk siswa yang submit tugas.")
                     
@@ -170,14 +170,14 @@ if choice == "Stat data Bersih":
 
     # --- BAGIAN 3: INSIGHT DETAIL (TEKS LEBIH PANJANG) ---
     st.markdown("---")
-    st.subheader("Insight Detail")
+    st.subheader("Insight Mendalam")
     
-    with st.expander("Baca Detail Insight Persiapan data", expanded=False):
+    with st.expander("Baca Detail Insight Persiapan Data", expanded=False):
         st.markdown("""
-        **1. Kualitas data: Sudah Bersih Sempurna**
+        **1. Kualitas Data: Sudah Bersih Sempurna**
         *   **Removed rows:** `0`
         *   **Implikasi:** Tidak ada *negative weeks* yang lolos ke tahap analisis. Pipeline pembersihan data berfungsi optimal.
-        *   **Status:** data siap dianalisis tanpa *preprocessing* tambahan.
+        *   **Status:** Data siap dianalisis tanpa *preprocessing* tambahan.
 
         **2. Distribusi Mingguan: Sangat Seimbang**
         Distribusi data antar minggu hampir merata (~25% per minggu), menjamin analisis tren tidak bias.
@@ -189,14 +189,14 @@ if choice == "Stat data Bersih":
         *   **Handling:** Cukup gunakan `class_weight="balanced"`. Tidak perlu SMOTE.
         *   **Metrik:** Gunakan **F1-score** dan **ROC-AUC**. *Accuracy* saja tidak cukup (Baseline: 58.4%).
 
-        **4. Kehilangan data pada df_pb2**
+        **4. Kehilangan Data pada df_pb2**
         Terjadi pengurangan signifikan dari 27,795 siswa menjadi 20,818 siswa (hilang ~25.1%).
         *   **Penyebab:** Siswa yang *Withdrawn* sangat awal tidak punya data `days_diff` atau `score`.
         *   **Dampak:** Analisis korelasi `days_diff` vs `score` **hanya merepresentasikan** siswa aktif. Siswa risiko tertinggi (tidak submit) tidak tercakup di sini.
 
-        **5. Validasi Skala data**
+        **5. Validasi Skala Data**
         *   **Shape Identik:** `df_early` dan `df_full` sama-sama **92,088 × 17**.
-        *   **Konfirmasi:** Filter perbaikan berhasil. data hanya mencakup **Minggu 1–4**.
+        *   **Konfirmasi:** Filter perbaikan berhasil. Data hanya mencakup **Minggu 1–4**.
         """)
 
 # =============================================================
@@ -210,9 +210,9 @@ elif choice == "Pertanyaan Bisnis":
     # --- SUB-MENU PILIHAN PERTANYAAN ---
         # --- SUB-MENU PILIHAN PERTANYAAN ---
     bq_options = {
-        "BQ1: Rata-rata Klik Mingguan (Pass vs Fail)": "bq1",
-        "BQ2: Korelasi Waktu Submit vs Skor": "bq2",
-        "BQ3: Penurunan Aktivitas Demografi": "bq3"
+        "Pertanyaan Bisnis 1: Rata-rata Klik Mingguan (Pass vs Fail)": "bq1",
+        "Pertanyaan Bisnis 2: Korelasi Waktu Submit vs Skor": "bq2",
+        "Pertanyaan Bisnis 3: Penurunan Aktivitas Demografi": "bq3"
     }
     
     selected_bq = st.selectbox("Pilih Pertanyaan Bisnis:", list(bq_options.keys()))
@@ -222,7 +222,7 @@ elif choice == "Pertanyaan Bisnis":
     # LOGIKA BQ1 (Sudah Dikonversi)
     # =============================================================
     if bq_key == "bq1":
-        st.header("Pertayaan 1: Rata-rata Klik Mingguan per Grup Risiko")
+        st.header("Pertanyaan Bisnis 1: Rata-rata Klik Mingguan per Grup Risiko")
         st.markdown(
             "_Berapa rata-rata jumlah klik mingguan pada 4 minggu pertama yang "
             "membedakan siswa **Pass/Distinction** vs **Fail/Withdrawn**?_"
@@ -327,7 +327,7 @@ elif choice == "Pertanyaan Bisnis":
             pct       = selisih / fail_mean * 100 if fail_mean != 0 else 0
 
             st.info(
-                f" **Insight Pertayaan 1:** Siswa Pass/Distinction rata-rata mengklik "
+                f"**Insight:** Siswa Pass/Distinction rata-rata mengklik "
                 f"**{pass_mean:.1f} kali/minggu**, sedangkan Fail/Withdrawn hanya "
                 f"**{fail_mean:.1f} kali/minggu** — selisih **{selisih:.1f} klik "
                 f"({pct:.1f}% lebih tinggi)** secara konsisten di semua minggu. "
@@ -339,17 +339,17 @@ elif choice == "Pertanyaan Bisnis":
     # LOGIKA BQ2 (Korelasi Waktu Submit vs Skor)
     # =============================================================
     elif bq_key == "bq2":
-        st.header("Pertayaan 2: Korelasi Waktu Submit vs Skor Akhir")
+        st.header("Pertanyaan Bisnis 2: Korelasi Waktu Submit vs Skor Akhir")
         st.markdown(
             "_Bagaimana korelasi antara selisih waktu pengumpulan tugas pertama "
             "(**days_diff**) dengan skor akhir yang diperoleh siswa?_"
         )
 
-        # Persiapan data
+        # Persiapan Data
         # Pastikan kolom ada, jika tidak tampilkan pesan error
         required_cols = ["days_diff", "score", "risk_group"]
         if not all(col in df_final.columns for col in required_cols):
-            st.error(f"data tidak lengkap. Kolom yang dibutuhkan: {required_cols}")
+            st.error(f"Data tidak lengkap. Kolom yang dibutuhkan: {required_cols}")
             st.stop()
 
         df_bq2 = df_final[["days_diff", "score", "risk_group"]].dropna()
@@ -369,7 +369,7 @@ elif choice == "Pertanyaan Bisnis":
         prop_late = df_bq2['is_late'].mean() * 100
 
         # --- METRIK UTAMA ---
-        st.subheader("Statistik Kunci")
+        st.subheader("Statistik Utama")
         col1, col2, col3 = st.columns(3)
         col1.metric("Pearson r", f"{pearson_r:.4f}", help="Korelasi linier antara keterlambatan dan skor.")
         col2.metric("Spearman r", f"{spearman_r:.4f}", help="Korelasi non-parametrik (ranking).")
@@ -439,20 +439,21 @@ elif choice == "Pertanyaan Bisnis":
         # --- INSIGHT ---
         diff_score = on_time_scores.mean() - late_scores.mean()
         st.info(
-            f"**Insight BQ2:** Korelasi days_diff vs score secara statistik lemah "
+            f"**Insight :** Korelasi days_diff vs score secara statistik lemah "
             f"(Pearson r={pearson_r:.3f}), namun **pola perilaku** jelas terlihat.\n"
             f"- Siswa yang submit **tepat/lebih awal** rata-rata skor **{on_time_scores.mean():.1f}**.\n"
             f"- Siswa yang **terlambat** rata-rata skor **{late_scores.mean():.1f}**.\n"
             f"- **Selisih performa: {diff_score:.1f} poin.**\n"
-            f"**Rekomendasi penyelesaian masalah:** Keterlambatan submit adalah *red flag* dini. Berikan intervensi segera jika `days_diff > 0`."
+            f"\n**Tindakan Rekomendasi:** Keterlambatan submit adalah *red flag* dini. Berikan intervensi segera jika `days_diff > 0`."
         )
 
         st.markdown("---")
+
     # =============================================================
     # LOGIKA BQ3 (Penurunan Aktivitas Demografi)
     # =============================================================
     elif bq_key == "bq3":
-        st.header("Pertayaan 3: Penurunan Aktivitas per Kelompok Demografi")
+        st.header("Pertanyaan Bisnis 3: Penurunan Aktivitas per Kelompok Demografi")
         st.markdown(
             "_Kelompok demografi mana (`highest_education` atau `disability`) yang menunjukkan "
             "penurunan aktivitas interaksi VLE paling drastis selama 4 minggu pertama?_"
@@ -469,7 +470,7 @@ elif choice == "Pertanyaan Bisnis":
         if demo_option not in df_weekly.columns:
             st.warning(f"Kolom `{demo_option}` tidak ditemukan dalam data. Silakan pilih variabel lain atau periksa data.")
         else:
-            # Persiapan data
+            # Persiapan Data
             # Group by student, module, presentation, demo_var, week
             df_student_bq3 = df_weekly.groupby(
                 ["id_student", "code_module", "code_presentation", demo_option, "week"]
@@ -559,8 +560,8 @@ elif choice == "Pertanyaan Bisnis":
                     )
                     
                     # Cari ekstrem
-                    worst_drop_group = pivot_sorted.index[0]  # Added [0]
-                    worst_drop_val = pivot_sorted["Drop % (W3→W4)"].iloc[0]  # Added [0]
+                    worst_drop_group = pivot_sorted.index[0]
+                    worst_drop_val = pivot_sorted["Drop % (W3→W4)"].iloc[0]
                     
                     # Cari kelompok risiko tertinggi
                     if demo_option in df_final.columns:
@@ -572,15 +573,15 @@ elif choice == "Pertanyaan Bisnis":
 
                     # --- INSIGHT ---
                     st.info(
-                        f"**Insight Pertayaan Bisinis 3:** Berdasarkan **{demo_option.replace('_', ' ')}**:\n"
+                        f"**Insight Pertanyaan Bisnis 3:** Berdasarkan **{demo_option.replace('_', ' ')}**:\n"
                         f"1. **Penurunan Aktivitas Terbesar:** Kelompok **{worst_drop_group}** mengalami penurunan drastis "
                         f"sebesar **{worst_drop_val:.1f}%** dari minggu 3 ke 4.\n"
                         f"2. **Risiko Tertinggi:** Kelompok dengan risiko gagal tertinggi adalah **{worst_risk_group}** "
                         f"({worst_risk_val*100:.1f}%).\n"
-                        f"👉 **Rekomendasi penyelesaian masalah:** Fokuskan intervensi pada kelompok {worst_drop_group} di minggu ke-4 untuk mencegah drop-out."
+                        f"**Tindakan Rekomendasi:** Fokuskan intervensi pada kelompok {worst_drop_group} di minggu ke-4 untuk mencegah drop-out."
                     )
                 else:
-                    st.warning("data tidak cukup untuk menghitung tren penurunan mingguan.")
+                    st.warning("Data tidak cukup untuk menghitung tren penurunan mingguan.")
             else:
                 st.warning("Tidak ada data tren yang tersedia.")
 
@@ -632,11 +633,11 @@ elif choice == "Model MLM":
             files = os.listdir(folder)
             if any(f.endswith('.png') for f in files):
                 img_folder = folder
-                # st.success(f"Folder gambar ditemukan di: `{img_folder}`") # Opsional: tampilkan jika ingin debug
+                # st.success(f" Folder gambar ditemukan di: `{img_folder}`") #debug
                 break
     
     if img_folder is None:
-        st.error("**Folder gambar tidak ditemukan!**")
+        st.error("❌ **Folder gambar tidak ditemukan!**")
         st.markdown("Pastikan folder `code/img/mlm` atau `img/mlm` ada di direktori proyek Anda.")
         st.info("Gambar yang dicari: `01_test_performance.png`, `02_treshold_tuning.png`, dll.")
         st.stop()
