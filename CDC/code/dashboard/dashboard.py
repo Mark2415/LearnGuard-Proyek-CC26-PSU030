@@ -615,7 +615,7 @@ elif choice == "Model MLM":
     st.subheader("Detail Visualisasi Model")
     st.markdown("Klik pada kategori di bawah untuk melihat gambar detail.")
 
-    # --- PENCARIAN FOLDER GAMBAR (DIPERBAIKI) ---
+    # --- PENCARIAN FOLDER GAMBAR---
     # Mencoba berbagai kemungkinan path berdasarkan struktur 'code\img\mlm'
     possible_folders = [
         "code/img/mlm", 
