@@ -131,11 +131,11 @@ if choice == "Stat Data Bersih":
     css_frame = """
     <style>
     .img-frame {
-        border: 3px solid black;       /* Frame hitam tebal */
-        background-color: white;       /* Background putih */
-        padding: 15px;                 /* Jarak dalam frame */
-        margin-bottom: 30px;           /* Jarak antar gambar */
-        border-radius: 8px;            /* Sudut sedikit melengkung (opsional) */
+        border: 3px solid black;
+        background-color: white;
+        padding: 15px;
+        margin-bottom: 30px;
+        border-radius: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -146,11 +146,19 @@ if choice == "Stat Data Bersih":
         display: block;
     }
     .insight-box {
-        background-color: #f0f2f6;
+        background-color: #172C43;
+        margin-bottom: 40px;
         padding: 15px;
         border-left: 5px solid #2ecc71;
         margin-top: 10px;
         border-radius: 4px;
+        font-size: 0.95em;
+    }
+    .insight-title {
+        font-weight: bold;
+        color: #2ecc71;
+        margin-bottom: 5px;
+        display: block;
     }
     </style>
     """
@@ -159,37 +167,51 @@ if choice == "Stat Data Bersih":
     for img_name in images:
         img_path = os.path.join(img_folder, img_name)
         img_title = img_name.replace(".png", "").replace("_", " ").title()
-        
+        insight_text = "" # Variabel untuk menampung insight
+
         if os.path.exists(img_path):
-            # Membaca gambar sebagai base64 untuk embed HTML
+            # Membaca gambar sebagai base64
             with open(img_path, "rb") as f:
                 base64_img = base64.b64encode(f.read()).decode()
+
+            # Menentukan Insight berdasarkan nama file
+            if "quality" in img_name.lower():
+                insight_text = "Data bersih tanpa penghapusan baris."
+                label = "Kualitas Data"
+            elif "mingguan" in img_name.lower():
+                insight_text = "Distribusi mingguan seimbang (~25% per minggu)."
+                label = "Distribusi Waktu"
+            elif "risk" in img_name.lower():
+                insight_text = "Rasio 58:42 (Pass:Fail). Moderat, disarankan pakai class_weight."
+                label = "Imbalance Ratio"
+            elif "lost" in img_name.lower():
+                insight_text = "25.1% data hilang di df_pb2 (siswa tanpa tugas)."
+                label = "Data Loss"
+            elif "korelasi" in img_name.lower():
+                insight_text = "Analisis hanya berlaku untuk siswa yang submit tugas."
+                label = "Cakupan Data"
+            else:
+                insight_text = "Visualisasi menunjukkan pola umum dari dataset."
+                label = "Insight Umum"
+
+            # Render Judul
+            st.markdown(f"#### {img_title}")
             
-            # Membuat layout kolom untuk gambar dan deskripsi singkat
-            col_img, col_info = st.columns([3, 1])
+            # Render Gambar dengan Frame
+            st.markdown(f"""
+            <div class="img-frame">
+                <img src="data:image/png;base64,{base64_img}">
+            </div>
+            """, unsafe_allow_html=True)
             
-            with col_img:
-                st.markdown(f"#### {img_title}")
-                # Menampilkan gambar dengan frame custom
-                st.markdown(f"""
-                <div class="img-frame">
-                    <img src="data:image/png;base64,{base64_img}">
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col_info:
-                # Insight singkat berdasarkan gambar (opsional, bisa disesuaikan)
-                if "quality" in img_name.lower():
-                    st.markdown("**Kualitas:** 0 baris dihapus. Data bersih.")
-                elif "mingguan" in img_name.lower():
-                    st.markdown("**Balance:** Distribusi mingguan seimbang (~25% per minggu).")
-                elif "risk" in img_name.lower():
-                    st.markdown("**Imbalance:** Rasio 58:42 (Pass:Fail). Moderat, bisa pakai class_weight.")
-                elif "lost" in img_name.lower():
-                    st.markdown("**Data Loss:** 25.1% data hilang di df_pb2 (siswa tanpa tugas).")
-                elif "korelasi" in img_name.lower():
-                    st.markdown("**Korelasi:** Hanya berlaku untuk siswa yang submit tugas.")
-                    
+            # Render Insight Box
+            st.markdown(f"""
+            <div class="insight-box">
+                <span class="insight-title">{label}</span>
+                {insight_text}
+            </div>
+            """, unsafe_allow_html=True)
+            # Tambahkan spasi vertikal antar item (menggunakan margin-bottom pada insight-box di CSS)
         else:
             st.error(f"Gambar tidak ditemukan: `{img_path}`")
 
