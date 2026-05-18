@@ -112,7 +112,7 @@ if choice == "Stat Data Bersih":
     # --- BAGIAN 2: VISUALISASI GAMBAR (FRAME HITAM & BACKGROUND PUTIH) ---
     st.subheader("Visualisasi Data")
     
-    img_folder = "img" 
+    img_folder = "data/img" 
     images = [
         "01_data_quality.png",
         "02_distribution mingguan.png",
@@ -660,7 +660,7 @@ elif choice == "Model MLM":
     # --- PENCARIAN FOLDER GAMBAR---
     # Mencoba berbagai kemungkinan path berdasarkan struktur 'code\img\mlm'
     possible_folders = [
-        "code/img/mlm", 
+        "data/img/mlm", 
         "img/mlm", 
         "code/img", 
         "img", 
