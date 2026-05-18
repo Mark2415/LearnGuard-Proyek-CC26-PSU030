@@ -86,10 +86,6 @@ with st.sidebar:
     menu_options = ["Stat Data Bersih", "Pertanyaan Bisnis", "Model MLM"]
     choice = st.radio("Pilih Menu:", menu_options)
 
-# Example usage to show the result
-if choice:
-    st.write(f"Anda memilih: **{choice}**")
-
 # =============================================================
 # HALAMAN: STAT DATA BERSIH (HOME)
 # =============================================================
