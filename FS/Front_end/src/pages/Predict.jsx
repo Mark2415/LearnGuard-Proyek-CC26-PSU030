@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { predictStudent } from '../services/api'
+import { useEffect, useState } from 'react'
+import { predictStudent, getStudents } from '../services/api'
+import { TbChartInfographic } from "react-icons/tb";
 
 const initialForm = {
   id_student: '',
@@ -17,11 +18,52 @@ export default function Predict() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [students, setStudents] = useState([])
+
+  useEffect(() => {
+    getStudents({ page: 1, limit: 100 })
+      .then(res => setStudents(res.data.data))
+      .catch(err => console.error(err))
+  }, [])
 
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    const { name, value } = e.target
 
+    setForm(prev => {
+      let updatedForm = {
+        ...prev,
+        [name]: value,
+      }
+
+      if (name === 'id_student') {
+        const selectedStudent = students.find(
+          student => String(student.id_student) === String(value)
+        )
+
+        if (selectedStudent) {
+          updatedForm = {
+            ...updatedForm,
+            total_clicks: selectedStudent.total_clicks,
+            active_weeks: selectedStudent.active_weeks,
+            avg_clicks: selectedStudent.avg_clicks,
+          }
+        }
+      }
+
+      if (name === 'total_clicks' || name === 'active_weeks') {
+        const totalClicks = Number(updatedForm.total_clicks)
+        const activeWeeks = Number(updatedForm.active_weeks)
+
+        if (totalClicks > 0 && activeWeeks > 0) {
+          updatedForm.avg_clicks = (totalClicks / activeWeeks).toFixed(1)
+        } else {
+          updatedForm.avg_clicks = ''
+        }
+      }
+
+      return updatedForm
+    })
+  }
   const handleSubmit = async () => {
     setError('')
     setResult(null)
@@ -35,7 +77,7 @@ export default function Predict() {
       console.log(res.data.data)
       setResult(res.data.data)
     } catch (err) {
-      setError('Gagal melakukan prediksi. Pastikan backend & AI API sudah berjalan.')
+      setError('Gagal melakukan prediksi. Pastikan Backend & AI API sudah berjalan.')
     } finally {
       setLoading(false)
     }
@@ -59,19 +101,44 @@ export default function Predict() {
           <div className="form-grid">
             <div className="form-group">
               <label>ID Siswa (opsional)</label>
-              <input name="id_student" value={form.id_student} onChange={handleChange} placeholder="cth: 12345" />
+              <select name="id_student" value={form.id_student} onChange={handleChange}>
+                <option value="">Pilih ID Siswa</option>
+                {students.map((student, index) => (
+                  <option key={index} value={student.id_student}>
+                    {student.id_student}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label>Rata-rata Klik *</label>
-              <input name="avg_clicks" type="number" value={form.avg_clicks} onChange={handleChange} placeholder="cth: 77.5" />
+              <input
+                name="avg_clicks"
+                type="number"
+                value={form.avg_clicks}
+                readOnly
+                placeholder="Otomatis dari total klik ÷ minggu aktif"
+              />
             </div>
             <div className="form-group">
               <label>Total Klik *</label>
-              <input name="total_clicks" type="number" value={form.total_clicks} onChange={handleChange} placeholder="cth: 310" />
+              <input
+                name="total_clicks"
+                type="number"
+                value={form.total_clicks}
+                readOnly
+                placeholder="Otomatis dari data siswa"
+              />
             </div>
             <div className="form-group">
               <label>Minggu Aktif *</label>
-              <input name="active_weeks" type="number" value={form.active_weeks} onChange={handleChange} placeholder="cth: 4" />
+              <input
+                name="active_weeks"
+                type="number"
+                value={form.active_weeks}
+                readOnly
+                placeholder="Otomatis dari data siswa"
+              />
             </div>
             <div className="form-group">
               <label>Terlambat Submit?</label>
@@ -113,10 +180,33 @@ export default function Predict() {
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Memproses...' : '🔮 Prediksi Sekarang'}
+            <button
+              className="btn btn-primary"
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? 'Memproses...' : (
+                <>
+                  <TbChartInfographic size={18} />
+                  <span>Prediksi Sekarang</span>
+                </>
+              )}
             </button>
-            <button className="btn" style={{ background: '#f1f5f9' }} onClick={handleReset}>Reset</button>
+
+            <button
+              className="btn"
+              style={{ background: '#f1f5f9' }}
+              onClick={handleReset}
+            >
+              Reset
+            </button>
           </div>
         </div>
 
@@ -126,7 +216,9 @@ export default function Predict() {
 
           {!result ? (
             <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🔮</div>
+              <div style={{ marginBottom: 12 }}>
+                <TbChartInfographic size={48} />
+              </div>
               <div style={{ fontSize: 14 }}>
                 Isi form dan klik Prediksi untuk melihat hasil
               </div>
@@ -154,6 +246,16 @@ export default function Predict() {
                   <div className="result-prob">
                     Probabilitas Risiko:{' '}
                     {(result.risk_probability * 100).toFixed(1)}%
+                  </div>
+
+                  <div className={`insight-box ${isLowRisk ? 'low' : 'high'}`}>
+                    <strong>Insight:</strong>
+
+                    <p>
+                      {isLowRisk
+                        ? 'Siswa menunjukkan aktivitas belajar yang cukup stabil. Pertahankan konsistensi interaksi, kehadiran, dan penyelesaian tugas agar performa tetap baik.'
+                        : 'Siswa memerlukan perhatian lebih. Disarankan untuk memantau aktivitas mingguan, memberikan pendampingan belajar, dan mengevaluasi modul yang masih sulit dipahami.'}
+                    </p>
                   </div>
                 </div>
               )

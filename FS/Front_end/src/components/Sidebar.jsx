@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom'
+import { TbChartInfographic } from "react-icons/tb";
 
 const navItems = [
   { path: '/',          label: 'Dashboard',  icon: '📊' },
   { path: '/students',  label: 'Students',   icon: '👥' },
-  { path: '/predict',   label: 'Predict',    icon: '🔮' },
+  { path: '/predict', label: 'Predict',  icon: <TbChartInfographic size={20} /> }
 ]
 
 export default function Sidebar() {
