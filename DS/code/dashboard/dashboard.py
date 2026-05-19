@@ -756,7 +756,7 @@ elif choice == "Model MLM":
     with st.expander("3. Fitur Paling Penting (Feature Importance)", expanded=False):
         st.markdown("### Analisis Kontribusi Fitur terhadap Prediksi")
         images_part3 = [
-            "06_top_15_feature_importance.png"
+            "05_top_15_feature_importance.png"
         ]
         for img in images_part3:
             render_image_in_frame(img, img_folder)
