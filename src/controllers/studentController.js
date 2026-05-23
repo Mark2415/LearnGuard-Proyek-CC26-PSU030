@@ -3,13 +3,18 @@ const pool = require('../config/db');
 // GET /api/students
 const getAllStudents = async (req, res) => {
   try {
-    const { page = 1, limit = 20, risk_label, final_result } = req.query;
+    const { page = 1, limit = 20, risk_label, final_result, search } = req.query;
     const offset = (page - 1) * limit;
 
     let query = 'SELECT * FROM students WHERE 1=1';
     const params = [];
 
-    if (risk_label !== undefined) {
+    if (search) {
+      params.push(`%${search}%`);
+      query += ` AND CAST(id_student AS TEXT) LIKE $${params.length}`;
+    }
+
+    if (risk_label !== undefined && risk_label !== '') {
       params.push(risk_label);
       query += ` AND risk_label = $${params.length}`;
     }
@@ -27,14 +32,22 @@ const getAllStudents = async (req, res) => {
     // Total count
     let countQuery = 'SELECT COUNT(*) FROM students WHERE 1=1';
     const countParams = [];
-    if (risk_label !== undefined) {
+
+    if (search) {
+      countParams.push(`%${search}%`);
+      countQuery += ` AND CAST(id_student AS TEXT) LIKE $${countParams.length}`;
+    }
+
+    if (risk_label !== undefined && risk_label !== '') {
       countParams.push(risk_label);
       countQuery += ` AND risk_label = $${countParams.length}`;
     }
+
     if (final_result) {
       countParams.push(final_result);
       countQuery += ` AND final_result = $${countParams.length}`;
     }
+
     const countResult = await pool.query(countQuery, countParams);
     const total = parseInt(countResult.rows[0].count);
 
