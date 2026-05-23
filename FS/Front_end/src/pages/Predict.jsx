@@ -19,13 +19,11 @@ export default function Predict() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [students, setStudents] = useState([])
-  const [loadingStudents, setLoadingStudents] = useState(true)
 
   useEffect(() => {
-    getStudents({ page: 1, limit: 9999 })
+    getStudents({ page: 1, limit: 100 })
       .then(res => setStudents(res.data.data))
       .catch(err => console.error(err))
-      .finally(() => setLoadingStudents(false))
   }, [])
 
   const handleChange = (e) => {
@@ -66,21 +64,17 @@ export default function Predict() {
       return updatedForm
     })
   }
-
   const handleSubmit = async () => {
     setError('')
     setResult(null)
-    if (!form.id_student) {
-      setError('Harap pilih ID Siswa terlebih dahulu.')
-      return
-    }
     if (!form.avg_clicks || !form.total_clicks || !form.active_weeks) {
-      setError('Data siswa tidak lengkap. Pilih siswa lain.')
+      setError('Harap isi semua field yang wajib diisi.')
       return
     }
     setLoading(true)
     try {
       const res = await predictStudent(form)
+      console.log(res.data.data)
       setResult(res.data.data)
     } catch (err) {
       setError('Gagal melakukan prediksi. Pastikan Backend & AI API sudah berjalan.')
@@ -107,30 +101,44 @@ export default function Predict() {
           <div className="form-grid">
             <div className="form-group">
               <label>ID Siswa *</label>
-              {loadingStudents ? (
-                <select disabled><option>Memuat data siswa...</option></select>
-              ) : (
-                <select name="id_student" value={form.id_student} onChange={handleChange} required>
-                  <option value="">Pilih ID Siswa</option>
-                  {students.map((student, index) => (
-                    <option key={index} value={student.id_student}>
-                      {student.id_student}
-                    </option>
-                  ))}
-                </select>
-              )}
+              <select name="id_student" value={form.id_student} onChange={handleChange} required>
+                <option value="">Pilih ID Siswa</option>
+                {students.map((student, index) => (
+                  <option key={index} value={student.id_student}>
+                    {student.id_student}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
-              <label>Rata-rata Klik</label>
-              <input name="avg_clicks" type="number" value={form.avg_clicks} readOnly placeholder="Otomatis dari data siswa" style={{ background: '#f8fafc', color: '#64748b' }} />
+              <label>Rata-rata Klik *</label>
+              <input
+                name="avg_clicks"
+                type="number"
+                value={form.avg_clicks}
+                readOnly
+                placeholder="Otomatis dari total klik ÷ minggu aktif"
+              />
             </div>
             <div className="form-group">
-              <label>Total Klik</label>
-              <input name="total_clicks" type="number" value={form.total_clicks} readOnly placeholder="Otomatis dari data siswa" style={{ background: '#f8fafc', color: '#64748b' }} />
+              <label>Total Klik *</label>
+              <input
+                name="total_clicks"
+                type="number"
+                value={form.total_clicks}
+                readOnly
+                placeholder="Otomatis dari data siswa"
+              />
             </div>
             <div className="form-group">
-              <label>Minggu Aktif</label>
-              <input name="active_weeks" type="number" value={form.active_weeks} readOnly placeholder="Otomatis dari data siswa" style={{ background: '#f8fafc', color: '#64748b' }} />
+              <label>Minggu Aktif *</label>
+              <input
+                name="active_weeks"
+                type="number"
+                value={form.active_weeks}
+                readOnly
+                placeholder="Otomatis dari data siswa"
+              />
             </div>
             <div className="form-group">
               <label>Terlambat Submit?</label>
@@ -155,7 +163,18 @@ export default function Predict() {
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button className="btn btn-primary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} onClick={handleSubmit} disabled={loading}>
+            <button
+              className="btn btn-primary"
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
               {loading ? 'Memproses...' : (
                 <>
                   <TbChartInfographic size={18} />
@@ -163,7 +182,14 @@ export default function Predict() {
                 </>
               )}
             </button>
-            <button className="btn" style={{ background: '#f1f5f9' }} onClick={handleReset}>Reset</button>
+
+            <button
+              className="btn"
+              style={{ background: '#f1f5f9' }}
+              onClick={handleReset}
+            >
+              Reset
+            </button>
           </div>
         </div>
 
@@ -176,25 +202,38 @@ export default function Predict() {
               <div style={{ marginBottom: 12 }}>
                 <TbChartInfographic size={48} />
               </div>
-              <div style={{ fontSize: 14 }}>Pilih siswa dan klik Prediksi untuk melihat hasil</div>
+              <div style={{ fontSize: 14 }}>
+                Isi form dan klik Prediksi untuk melihat hasil
+              </div>
             </div>
           ) : (
             (() => {
               const isLowRisk = result.risk_probability < 0.5
+
               return (
                 <div className={`result-box ${isLowRisk ? 'low' : 'high'}`}>
-                  <div style={{ fontSize: 48, marginBottom: 8 }}>{isLowRisk ? '✅' : '⚠️'}</div>
+                  <div style={{ fontSize: 48, marginBottom: 8 }}>
+                    {isLowRisk ? '✅' : '⚠️'}
+                  </div>
+
                   <div className={`result-level ${isLowRisk ? 'low' : 'high'}`}>
                     {isLowRisk ? 'Risiko Rendah' : 'Risiko Tinggi'}
                   </div>
+
                   <div className="result-msg">
-                    {isLowRisk ? 'Risiko rendah, kondisi pembelajaran stabil.' : 'Mahasiswa berisiko tinggi mengalami kesulitan belajar.'}
+                    {isLowRisk
+                      ? 'Risiko rendah, kondisi pembelajaran stabil.'
+                      : 'Mahasiswa berisiko tinggi mengalami kesulitan belajar.'}
                   </div>
+
                   <div className="result-prob">
-                    Probabilitas Risiko: {(result.risk_probability * 100).toFixed(1)}%
+                    Probabilitas Risiko:{' '}
+                    {(result.risk_probability * 100).toFixed(1)}%
                   </div>
+
                   <div className={`insight-box ${isLowRisk ? 'low' : 'high'}`}>
                     <strong>Insight:</strong>
+
                     <p>
                       {isLowRisk
                         ? 'Siswa menunjukkan aktivitas belajar yang cukup stabil. Pertahankan konsistensi interaksi, kehadiran, dan penyelesaian tugas agar performa tetap baik.'
@@ -210,3 +249,4 @@ export default function Predict() {
     </div>
   )
 }
+
