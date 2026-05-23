@@ -23,16 +23,15 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     # Pastikan path ini sesuai dengan lokasi file Anda saat dijalankan
-    # Contoh: '../data/processed/wrangled/df_master_weekly_clean.csv'
     try:
-        df_weekly = pd.read_csv('../../data/processed/wrangled/df_master_weekly_clean.csv')
+        df_weekly = pd.read_csv('DS/code/dashboard/data/processed/wrangled/df_master_weekly_clean.csv')
         df_weekly = df_weekly[df_weekly["week"].isin([1, 2, 3, 4])].copy()
         df_weekly["risk_group"] = df_weekly["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
         })
 
-        df_final = pd.read_csv("../../data/processed/df_final.csv")
+        df_final = pd.read_csv("DS/code/dashboard/data/processed/df_final.csv")
         df_final["risk_group"] = df_final["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
@@ -86,10 +85,6 @@ with st.sidebar:
     menu_options = ["Stat Data Bersih", "Pertanyaan Bisnis", "Model MLM"]
     choice = st.radio("Pilih Menu:", menu_options)
 
-# Example usage to show the result
-if choice:
-    st.write(f"Anda memilih: **{choice}**")
-
 # =============================================================
 # HALAMAN: STAT DATA BERSIH (HOME)
 # =============================================================
@@ -117,7 +112,7 @@ if choice == "Stat Data Bersih":
     # --- BAGIAN 2: VISUALISASI GAMBAR (FRAME HITAM & BACKGROUND PUTIH) ---
     st.subheader("Visualisasi Data")
     
-    img_folder = "img" 
+    img_folder = "DS/code/dashboard/data/img" 
     images = [
         "01_data_quality.png",
         "02_distribution mingguan.png",
@@ -665,8 +660,8 @@ elif choice == "Model MLM":
     # --- PENCARIAN FOLDER GAMBAR---
     # Mencoba berbagai kemungkinan path berdasarkan struktur 'code\img\mlm'
     possible_folders = [
-        "code/img/mlm", 
-        "img/mlm", 
+        "data/img/mlm", 
+        "DS/code/dashboard/data/img/mlm", 
         "code/img", 
         "img", 
         "../code/img/mlm", 
@@ -761,7 +756,7 @@ elif choice == "Model MLM":
     with st.expander("3. Fitur Paling Penting (Feature Importance)", expanded=False):
         st.markdown("### Analisis Kontribusi Fitur terhadap Prediksi")
         images_part3 = [
-            "06_top_15_feature_importance.png"
+            "05_top_15_feature_importance.png"
         ]
         for img in images_part3:
             render_image_in_frame(img, img_folder)
