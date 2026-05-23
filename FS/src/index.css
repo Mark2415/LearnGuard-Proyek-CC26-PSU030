@@ -714,3 +714,11 @@ table {
     grid-template-columns: 1fr;
   }
 }
+
+.page-description {
+  margin-top: 6px;
+  max-width: 720px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}

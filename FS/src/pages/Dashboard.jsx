@@ -43,8 +43,18 @@ export default function Dashboard() {
 
   return (
     <div>
+
       <h1 className="page-title">Dashboard</h1>
-      <p className="page-subtitle">Ringkasan data siswa e-learning</p>
+
+      <p className="page-subtitle">
+        Ringkasan data siswa e-learning
+      </p>
+
+      <p className="page-description">
+        Dashboard ini menampilkan ringkasan data siswa, distribusi hasil akhir,
+        tingkat risiko, serta pola aktivitas belajar untuk membantu pemantauan
+        performa siswa.
+      </p>
 
       <div className="stats-grid">
         <div className="stat-card">
