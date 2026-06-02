@@ -24,14 +24,14 @@ st.set_page_config(
 def load_data():
     # Pastikan path ini sesuai dengan lokasi file Anda saat dijalankan
     try:
-        df_weekly = pd.read_csv('DS/code/dashboard/data/processed/wrangled/df_master_weekly_clean.csv')
+        df_weekly = pd.read_csv('data/processed/wrangled/df_master_weekly_clean.csv')
         df_weekly = df_weekly[df_weekly["week"].isin([1, 2, 3, 4])].copy()
         df_weekly["risk_group"] = df_weekly["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
         })
 
-        df_final = pd.read_csv("DS/code/dashboard/data/processed/df_final.csv")
+        df_final = pd.read_csv("data/processed/df_final.csv")
         df_final["risk_group"] = df_final["risk_label"].map({
             0: "Pass/Distinction",
             1: "Fail/Withdrawn"
@@ -661,7 +661,7 @@ elif choice == "Model MLM":
     # Mencoba berbagai kemungkinan path berdasarkan struktur 'code\img\mlm'
     possible_folders = [
         "data/img/mlm", 
-        "DS/code/dashboard/data/img/mlm", 
+        "data/img/mlm", 
         "code/img", 
         "img", 
         "../code/img/mlm", 
