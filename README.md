@@ -17,4 +17,4 @@
 ## App Result
 - [Main web application](https://capstonebare-bbnf-merry-novias-projects.vercel.app/)
 
-- [Data Scientist Dashboard](https://learning-guard-data.streamlit.app/)
+- [Data Cleaning and Business question Dashboard](https://learning-guard-data.streamlit.app/)
